@@ -70,6 +70,8 @@ namespace RSP
          int ret(uint32_t pc);
          void exit(ReturnMode mode);
 
+         void print_registers();
+
       private:
          CPUState state;
          Func blocks[IMEM_WORDS] = {};
@@ -88,7 +90,6 @@ namespace RSP
 
 
          void init_symbol_table();
-         void print_registers();
 
          alignas(64) uint32_t cached_imem[IMEM_WORDS]  = {};
 

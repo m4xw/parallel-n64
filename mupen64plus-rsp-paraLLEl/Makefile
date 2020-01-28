@@ -1,7 +1,7 @@
 TARGET := main
 ARCH := x86_64
 
-SOURCES := $(wildcard *.cpp) $(wildcard rsp/*.cpp) $(wildcard arch/$(ARCH)/rsp/*.cpp)
+SOURCES := main.cpp rsp.cpp debug_jit.cpp jit.cpp $(wildcard rsp/*.cpp) $(wildcard arch/$(ARCH)/rsp/*.cpp)
 OBJECTS := $(SOURCES:.cpp=.o)
 DEPS := $(OBJECTS:.o=.d)
 CXXFLAGS += -Iarch/$(ARCH)/rsp
@@ -34,7 +34,7 @@ LDFLAGS += -lclangFrontend \
 			  -lclangAST \
 			  -lclangLex \
 			  -lclangBasic
-LDFLAGS += $(shell llvm-config --ldflags --libs --system-libs)
+LDFLAGS += $(shell llvm-config --ldflags --libs --system-libs) -ldl
 
 all: $(TARGET)
 

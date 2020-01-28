@@ -31,6 +31,7 @@ int RSP_MFC0(RSP::CPUState *rsp, unsigned rt, unsigned rd)
    // so don't bother implementing semaphores.
    // It makes Mario Golf run terribly for some reason.
 
+#ifdef PARALLEL_INTEGRATION
    // WAIT_FOR_CPU_HOST. From CXD4.
    if (rd == CP0_REGISTER_SP_STATUS)
    {
@@ -41,6 +42,7 @@ int RSP_MFC0(RSP::CPUState *rsp, unsigned rt, unsigned rd)
          return MODE_CHECK_FLAGS;
       }
    }
+#endif
 
    //if (rd == 4) // SP_STATUS_REG
    //   fprintf(stderr, "READING STATUS REG!\n");
