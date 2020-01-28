@@ -9,14 +9,14 @@ extern "C" {
 // Load 8-bit
 void RSP_LBV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 1) & 0xfff;
+   unsigned addr = (base + offset * 1) & 0xfff;
    reinterpret_cast<uint8_t*>(rsp->cp2.regs[rt].e)[MES(e)] = READ_MEM_U8(rsp->dmem, addr);
 }
 
 // Store 8-bit
 void RSP_SBV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 1) & 0xfff;
+   unsigned addr = (base + offset * 1) & 0xfff;
    uint8_t v = reinterpret_cast<uint8_t*>(rsp->cp2.regs[rt].e)[MES(e)];
 
 #ifdef INTENSE_DEBUG
@@ -32,7 +32,7 @@ void RSP_LSV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
    if (e & 1)
       return;
 
-   unsigned addr = (rsp->sr[base] + offset * 2) & 0xfff;
+   unsigned addr = (base + offset * 2) & 0xfff;
    unsigned correction = addr & 3;
    if (correction == 3)
       return;
@@ -49,7 +49,7 @@ void RSP_LSV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 // Store 16-bit
 void RSP_SSV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 2) & 0xfff;
+   unsigned addr = (base + offset * 2) & 0xfff;
    uint8_t v0 = reinterpret_cast<uint8_t*>(rsp->cp2.regs[rt].e)[MES(e)];
    uint8_t v1 = reinterpret_cast<uint8_t*>(rsp->cp2.regs[rt].e)[MES((e + 1) & 0xf)];
 
@@ -64,7 +64,7 @@ void RSP_SSV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 // Load 32-bit
 void RSP_LLV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 4) & 0xfff;
+   unsigned addr = (base + offset * 4) & 0xfff;
    if (e & 1)
       return;
    if (addr & 1)
@@ -80,7 +80,7 @@ void RSP_SLV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if ((e & 1) || (e > 0xc))
       return;
-   unsigned addr = (rsp->sr[base] + offset * 4) & 0xfff;
+   unsigned addr = (base + offset * 4) & 0xfff;
 
 #ifdef INTENSE_DEBUG
    fprintf(stderr, "SLV 0x%x, e = %u\n", addr, e);
@@ -101,7 +101,7 @@ void RSP_LDV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e & 1)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
    e >>= 1;
 
@@ -124,7 +124,7 @@ void RSP_LDV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 // Store 64-bit
 void RSP_SDV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
 
 #ifdef INTENSE_DEBUG
    fprintf(stderr, "SDV 0x%x, e = %u\n", addr, e);
@@ -156,7 +156,7 @@ void RSP_LPV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
    if (e != 0)
       return;
 
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
    for (unsigned i = 0; i < 8; i++)
       reg[i] = READ_MEM_U8(rsp->dmem, (addr + i) & 0xfff) << 8;
@@ -166,7 +166,7 @@ void RSP_SPV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
    for (unsigned i = 0; i < 8; i++)
       WRITE_MEM_U8(rsp->dmem, (addr + i) & 0xfff, int16_t(reg[i]) >> 8);
@@ -177,7 +177,7 @@ void RSP_SPV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 // saturation, but weird nonetheless.
 void RSP_LUV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
 
    if (e != 0)
@@ -203,7 +203,7 @@ void RSP_SUV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 8) & 0xfff;
+   unsigned addr = (base + offset * 8) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
    for (unsigned i = 0; i < 8; i++)
       WRITE_MEM_U8(rsp->dmem, (addr + i) & 0xfff, int16_t(reg[i]) >> 7);
@@ -215,7 +215,7 @@ void RSP_LHV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 0xe)
       return;
 
@@ -228,7 +228,7 @@ void RSP_SHV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    auto *reg = rsp->cp2.regs[rt].e;
    for (unsigned i = 0; i < 8; i++)
       WRITE_MEM_U8(rsp->dmem, (addr + 2 * i) & 0xfff, int16_t(reg[i]) >> 7);
@@ -237,7 +237,7 @@ void RSP_SHV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 // No idea what the purpose of this is.
 void RSP_SFV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xff3;
+   unsigned addr = (base + offset * 16) & 0xff3;
    auto *reg = rsp->cp2.regs[rt].e;
    switch (e)
    {
@@ -266,7 +266,7 @@ void RSP_LQV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e & 1)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
 
 #ifdef INTENSE_DEBUG
    fprintf(stderr, "LQV: 0x%x, e = %u, vt = %u, base = %u\n", addr, e, rt, base);
@@ -285,7 +285,7 @@ void RSP_LQV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 
 void RSP_SQV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned base)
 {
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 1)
       return;
 
@@ -315,7 +315,7 @@ void RSP_LRV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 1)
       return;
 
@@ -331,7 +331,7 @@ void RSP_SRV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
 {
    if (e != 0)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 1)
       return;
 
@@ -350,7 +350,7 @@ void RSP_LTV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
       return;
    if (rt & 7)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 0xf)
       return;
 
@@ -364,7 +364,7 @@ void RSP_STV(RSP::CPUState *rsp, unsigned rt, unsigned e, int offset, unsigned b
       return;
    if (rt & 7)
       return;
-   unsigned addr = (rsp->sr[base] + offset * 16) & 0xfff;
+   unsigned addr = (base + offset * 16) & 0xfff;
    if (addr & 0xf)
       return;
 

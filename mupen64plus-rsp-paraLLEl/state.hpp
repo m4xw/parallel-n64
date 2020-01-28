@@ -14,39 +14,39 @@
 
 namespace RSP
 {
-   enum RSPFlags
-   {
-      RSP_VCO = 0,
-      RSP_VCC = 1,
-      RSP_VCE = 2
-   };
+enum RSPFlags
+{
+	RSP_VCO = 0,
+	RSP_VCC = 1,
+	RSP_VCE = 2
+};
 
-   enum RSPAccumulator
-   {
-      RSP_ACC_LO = 16,
-      RSP_ACC_MD = 8,
-      RSP_ACC_HI = 0
-   };
+enum RSPAccumulator
+{
+	RSP_ACC_LO = 16,
+	RSP_ACC_MD = 8,
+	RSP_ACC_HI = 0
+};
 
-   enum CP0Registers
-   {
-      CP0_REGISTER_DMA_CACHE = 0,
-      CP0_REGISTER_DMA_DRAM = 1,
-      CP0_REGISTER_DMA_READ_LENGTH = 2,
-      CP0_REGISTER_DMA_WRITE_LENGTH = 3,
-      CP0_REGISTER_SP_STATUS = 4,
-      CP0_REGISTER_DMA_FULL = 5,
-      CP0_REGISTER_DMA_BUSY = 6,
-      CP0_REGISTER_SP_RESERVED = 7,
-      CP0_REGISTER_CMD_START = 8,
-      CP0_REGISTER_CMD_END = 9,
-      CP0_REGISTER_CMD_CURRENT = 10,
-      CP0_REGISTER_CMD_STATUS = 11,
-      CP0_REGISTER_CMD_CLOCK = 12,
-      CP0_REGISTER_CMD_BUSY = 13,
-      CP0_REGISTER_CMD_PIPE_BUSY = 14,
-      CP0_REGISTER_CMD_TMEM_BUSY = 15,
-   };
+enum CP0Registers
+{
+	CP0_REGISTER_DMA_CACHE = 0,
+	CP0_REGISTER_DMA_DRAM = 1,
+	CP0_REGISTER_DMA_READ_LENGTH = 2,
+	CP0_REGISTER_DMA_WRITE_LENGTH = 3,
+	CP0_REGISTER_SP_STATUS = 4,
+	CP0_REGISTER_DMA_FULL = 5,
+	CP0_REGISTER_DMA_BUSY = 6,
+	CP0_REGISTER_SP_RESERVED = 7,
+	CP0_REGISTER_CMD_START = 8,
+	CP0_REGISTER_CMD_END = 9,
+	CP0_REGISTER_CMD_CURRENT = 10,
+	CP0_REGISTER_CMD_STATUS = 11,
+	CP0_REGISTER_CMD_CLOCK = 12,
+	CP0_REGISTER_CMD_BUSY = 13,
+	CP0_REGISTER_CMD_PIPE_BUSY = 14,
+	CP0_REGISTER_CMD_TMEM_BUSY = 15,
+};
 
 // SP_STATUS read bits.
 #define SP_STATUS_HALT            0x0001
@@ -92,45 +92,39 @@ namespace RSP
 #define SP_CLR_SIG7               0x00800000
 #define SP_SET_SIG7               0x01000000
 
-   template<int N>
-   struct alignas(rsp_vect_t) AlignedRSPVector
-   {
-      uint16_t e[8 * N];
-   };
+template<int N>
+struct alignas(rsp_vect_t) AlignedRSPVector
+{
+	uint16_t e[8 * N];
+};
 
-   struct CP0
-   {
-      uint32_t *cr[16] = {};
-      uint32_t *irq = nullptr;
-   };
+struct CP0
+{
+	uint32_t *cr[16] = {};
+	uint32_t *irq = nullptr;
+};
 
-   struct alignas(64) CP2
-   {
-      AlignedRSPVector<1> regs[32];
-      AlignedRSPVector<2> flags[3];
-      AlignedRSPVector<3> acc;
-      int16_t div_out;
-      int16_t div_in;
-      int8_t dp_flag;
-   };
+struct alignas(64) CP2
+{
+	AlignedRSPVector<1> regs[32];
+	AlignedRSPVector<2> flags[3];
+	AlignedRSPVector<3> acc;
+	int16_t div_out;
+	int16_t div_in;
+	int8_t dp_flag;
+};
 
-   struct CPUState
-   {
-      uint32_t pc = 0;
-      uint32_t dirty_blocks = 0;
-      static_assert(CODE_BLOCKS <= 32, "Code blocks must fit in 32-bit register.");
+struct CPUState
+{
+	uint32_t pc = 0;
 
-      uint32_t has_delay_slot = 0;
-      uint32_t branch_target = 0;
+	uint32_t *dmem = nullptr;
+	uint32_t *imem = nullptr;
+	uint32_t *rdram = nullptr;
 
-      uint32_t sr[32] = {};
-      uint32_t *dmem = nullptr;
-      uint32_t *imem = nullptr;
-      uint32_t *rdram = nullptr;
-
-      CP2 cp2 = {};
-      CP0 cp0;
-   };
+	CP2 cp2 = {};
+	CP0 cp0;
+};
 }
 
 #endif

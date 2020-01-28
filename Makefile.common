@@ -482,57 +482,36 @@ endif
 endif
 
 ifeq ($(HAVE_PARALLEL_RSP), 1)
-### Tiny Tiger's LLE RSP JIT ###
    PARALLEL_RSP_ARCH := x86_64
-
-ifeq ($(WANT_LLVM_OVERRIDE), 1)
-	INCFLAGS += -I/usr/lib/llvm-$(LLVM_VERSION)/include
-endif
-
    SOURCES_CXX += \
-				$(RSPDIR_PARALLEL)/parallel.cpp \
-				$(RSPDIR_PARALLEL)/rsp.cpp \
-				$(wildcard $(RSPDIR_PARALLEL)/rsp/*.cpp) \
-				$(wildcard $(RSPDIR_PARALLEL)/arch/$(PARALLEL_RSP_ARCH)/rsp/*.cpp)
-	CXXFLAGS += -I$(RSPDIR_PARALLEL)/arch/$(PARALLEL_RSP_ARCH)/rsp
-	CFLAGS += -DHAVE_PARALLEL_RSP -DPARALLEL_INTEGRATION
-	CXXFLAGS += -DHAVE_PARALLEL_RSP -DPARALLEL_INTEGRATION
-ifeq ($(DEBUG_JIT), 1)
-	CXXFLAGS += -DDEBUG_JIT
-	LDFLAGS += -ldl -rdynamic
-	SOURCES_CXX += $(RSPDIR_PARALLEL)/debug_jit.cpp
-else
-	SOURCES_CXX += $(RSPDIR_PARALLEL)/jit.cpp
-endif
-ifeq ($(INTENSE_DEBUG), 1)
-	CFLAGS += -DINTENSE_DEBUG
-	CXXFLAGS += -DINTENSE_DEBUG
-endif
-LDFLAGS += -lclangFrontendTool \
-	   -lclangFrontend \
-	   -lclangDriver \
-	   -lclangSerialization \
-	   -lclangCodeGen \
-	   -lclangFrontend \
-	   -lclangParse \
-	   -lclangSema \
-	   -lclangStaticAnalyzerFrontend \
-	   -lclangStaticAnalyzerCheckers \
-	   -lclangStaticAnalyzerCore \
-	   -lclangAnalysis \
-	   -lclangRewriteFrontend \
-	   -lclangRewrite \
-	   -lclangEdit \
-	   -lclangASTMatchers \
-	   -lclangAST \
-	   -lclangLex \
-	   -lclangBasic
-ifeq ($(WANT_LLVM_OVERRIDE), 1)
-LDFLAGS += $(shell llvm-config-$(LLVM_VERSION) --ldflags --libs --link-static --system-libs)
-else
-LDFLAGS += $(shell llvm-config --ldflags --libs --link-static --system-libs)
-endif
-
+                  $(RSPDIR_PARALLEL)/parallel.cpp \
+                  $(RSPDIR_PARALLEL)/rsp.cpp \
+                  $(wildcard $(RSPDIR_PARALLEL)/rsp/*.cpp) \
+                  $(wildcard $(RSPDIR_PARALLEL)/arch/$(PARALLEL_RSP_ARCH)/rsp/*.cpp)
+   SOURCES_C += \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_disasm.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_memory.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_names.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_note.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_print.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/jit_size.c \
+                $(RSPDIR_PARALLEL)/lightning/lib/lightning.c \
+                $(RSPDIR_PARALLEL)/lightrec/blockcache.c \
+                $(RSPDIR_PARALLEL)/lightrec/disassembler.c \
+                $(RSPDIR_PARALLEL)/lightrec/emitter.c \
+                $(RSPDIR_PARALLEL)/lightrec/interpreter.c \
+                $(RSPDIR_PARALLEL)/lightrec/lightrec.c \
+                $(RSPDIR_PARALLEL)/lightrec/memmanager.c \
+                $(RSPDIR_PARALLEL)/lightrec/optimizer.c \
+                $(RSPDIR_PARALLEL)/lightrec/regcache.c
+   CXXFLAGS += -I$(RSPDIR_PARALLEL)/arch/$(PARALLEL_RSP_ARCH)/rsp
+   CFLAGS += -I$(RSPDIR_PARALLEL)/lightning/include
+   CFLAGS += -I$(RSPDIR_PARALLEL)/lightning/include
+   CXXFLAGS += -I$(RSPDIR_PARALLEL)/lightning/include
+   CXXFLAGS += -I$(RSPDIR_PARALLEL)/lightning/include
+   CXXFLAGS += -I$(RSPDIR_PARALLEL)/lightrec
+   CFLAGS += -DHAVE_PARALLEL_RSP -DPARALLEL_INTEGRATION -DENABLE_THREADED_COMPILER=0 -DENABLE_FIRST_PASS=0 -DENABLE_DISASSEMBLER=0 -DLIGHTREC_N64_RSP=1
+   CXXFLAGS += -DHAVE_PARALLEL_RSP -DPARALLEL_INTEGRATION -DENABLE_THREADED_COMPILER=0 -DENABLE_FIRST_PASS=0 -DENABLE_DISASSEMBLER=0 -DLIGHTREC_N64_RSP=1
 endif
 
 ifeq ($(HAVE_OPENGL),1)

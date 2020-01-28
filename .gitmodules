@@ -1,0 +1,3 @@
+[submodule "mupen64plus-rsp-paraLLEl/lightrec"]
+	path = mupen64plus-rsp-paraLLEl/lightrec
+	url = git://github.com/Themaister/lightrec

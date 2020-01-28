@@ -1,18 +1,22 @@
 #ifndef RSP_OP_HPP__
 #define RSP_OP_HPP__
 
+#include "lightrec.h"
+
 extern "C" {
-int RSP_MFC0(RSP::CPUState *rsp, unsigned rt, unsigned rd);
-int RSP_MTC0(RSP::CPUState *rsp, unsigned rd, unsigned rt);
+u32 RSP_MFC0(lightrec_state *rec, u32 rd);
+void RSP_MTC0(lightrec_state *rec, u32 reg, u32 value);
 
-void RSP_MTC2(RSP::CPUState *rsp, unsigned rt, unsigned vd, unsigned e);
-void RSP_MFC2(RSP::CPUState *rsp, unsigned rt, unsigned vs, unsigned e);
-void RSP_CFC2(RSP::CPUState *rsp, unsigned rt, unsigned rd);
-void RSP_CTC2(RSP::CPUState *rsp, unsigned rt, unsigned rd);
+void RSP_SWC2(lightrec_state *rec, u32 OPCODE, u32 op, u32 rt, u32 imm, s32 simm, u32 rs);
+void RSP_LWC2(lightrec_state *rec, u32 OPCODE, u32 op, u32 rt, u32 imm, s32 simm, u32 rs);
 
-void RSP_CALL(void *opaque, unsigned target, unsigned ret);
-void RSP_RETURN(void *opaque, unsigned pc);
-void RSP_EXIT(void *opaque, int mode);
+void RSP_COP2(lightrec_state *rec, u32 OPCODE, u32 op, u32 vd, u32 vs, u32 vt, u32 e);
+
+u32 RSP_CFC2(lightrec_state *rec, u32 OPCODE, u32 rd);
+void RSP_CTC2(lightrec_state *rec, u32 OPCODE, u32 value, u32 rd);
+
+u32 RSP_MFC2(lightrec_state *rec, u32 OPCODE, u32 rd, u32 imm);
+void RSP_MTC2(lightrec_state *rec, u32 OPCODE, u32 value, u32 rd, u32 imm);
 
 #define DECL_LS(op) \
    void RSP_##op(RSP::CPUState *rsp, unsigned rt, unsigned element, int offset, unsigned base)
@@ -85,7 +89,6 @@ DECL_COP2(VRSQL);
 DECL_COP2(VRSQH);
 DECL_COP2(VNOP);
 DECL_COP2(RESERVED);
-
 }
 
 #endif
