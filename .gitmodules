@@ -1,0 +1,3 @@
+[submodule "mupen64plus-rsp-paraLLEl"]
+	path = mupen64plus-rsp-paraLLEl
+	url = git://github.com/Themaister/parallel-rsp
